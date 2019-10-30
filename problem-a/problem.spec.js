@@ -99,16 +99,16 @@ describe('Song searching page', () => {
   test('searches on form submission', (done) => {    
     //mock this search!
     const searchResult = {results:[{artistName: "Test", trackName: "Test Track", previewUrl: "test link", artworkUrl100: "test image"}]};
-    const searchUrl = "https://itunes.apple.com/search?entity=song&limit=25&term=TestSearch"
+    //const searchUrl = "https://itunes.apple.com/search?entity=song&limit=25&term=TestSearch"
     fetchMock.restore(); //reset the mock
-    fetchMock.getOnce(searchUrl, searchResult);
+    fetchMock.getOnce('*', searchResult); //support any query
     
     $('#searchQuery').val('TestSearch'); //type a search
 
     $('button').click(); //submit!
     
     setImmediate(() => { //wait until promise has resolved (one tick)
-      expect(fetchMock.lastCall()[0]).toEqual(searchUrl); //was called with correct url
+     expect(fetchMock.lastCall()[0]).toMatch(/.*term=TestSearch/); //was called with correct url
       let records = $('#records img');
       expect(records.length).toBe(1); //only one record returned.
       expect(records.eq(1).attr('src')).toEqual(searchResult.artworkUrl100); //shows right image
